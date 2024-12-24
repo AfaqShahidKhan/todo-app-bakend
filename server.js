@@ -3,10 +3,7 @@ const app = require("./app");
 const PORT = 3000;
 
 mongoose
-  .connect("mongodb://localhost:27017/todo-app", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect("mongodb://localhost:27017/todo-app")
   .then(() => {
     console.log("Connected to database");
   })

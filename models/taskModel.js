@@ -19,9 +19,37 @@ const taskSchema = new mongoose.Schema(
       enum: ["pending", "in-progress", "completed"],
       default: "pending",
     },
+    priority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: "medium",
+    },
+    dueDate: {
+      type: Date,
+    },
+    overDue: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
+taskSchema.pre("save", function (next) {
+  if (this.dueDate < Date.now()) {
+    this.overDue = true;
+  }
+  next();
+});
+
 const Task = mongoose.model("Task", taskSchema);
+
+Task.filterTasks = async (queryParams) => {
+  const queryObj = { ...queryParams };
+  const excludedFields = ["page", "sort", "limit", "fields"];
+  excludedFields.forEach((el) => delete queryObj[el]);
+  const tasks = Task.find(queryObj);
+  return tasks;
+};
+
 module.exports = Task;
