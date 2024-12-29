@@ -42,6 +42,8 @@ taskSchema.pre("save", function (next) {
   next();
 });
 
+// taskSchema.index({ title: 1 }, { unique: true });
+
 const Task = mongoose.model("Task", taskSchema);
 
 Task.filterTasks = async (queryParams) => {
