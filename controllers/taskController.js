@@ -17,7 +17,9 @@ exports.getAllOverDueTasks = catchAsync(async (req, res, next) => {
   const tasks = await Task.find();
   // console.log(`total tasks are ${tasks}`);
 
-  const overDueTasks = tasks.filter((el) => el.overDue);
+  const overDueTasks = tasks.filter(
+    (task) => task.overDue || new Date(task.dueDate) < new Date()
+  );
 
   // console.log(`overdue tasks are ${overDueTasks}`);
 
