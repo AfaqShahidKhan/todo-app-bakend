@@ -3,6 +3,8 @@ const express = require("express");
 const taskController = require("../controllers/taskController");
 const router = express.Router();
 
+router.get('/overdue',taskController.getAllOverDueTasks)
+
 router
   .route("/")
   .get(taskController.getAllTasks)

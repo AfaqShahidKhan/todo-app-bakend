@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const ApiFeatures = require("../utils/apiFeatures");
 
 const taskSchema = new mongoose.Schema(
   {
@@ -47,11 +48,15 @@ taskSchema.pre("save", function (next) {
 const Task = mongoose.model("Task", taskSchema);
 
 Task.filterTasks = async (queryParams) => {
-  const queryObj = { ...queryParams };
-  const excludedFields = ["page", "sort", "limit", "fields"];
-  excludedFields.forEach((el) => delete queryObj[el]);
-  const tasks = Task.find(queryObj);
+  const features = new ApiFeatures(Task.find(), queryParams)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const tasks = await features.query;
   return tasks;
 };
+
+
 
 module.exports = Task;

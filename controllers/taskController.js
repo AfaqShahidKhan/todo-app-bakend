@@ -13,6 +13,23 @@ exports.getAllTasks = catchAsync(async (req, res) => {
   });
 });
 
+exports.getAllOverDueTasks = catchAsync(async (req, res, next) => {
+  const tasks = await Task.find();
+  // console.log(`total tasks are ${tasks}`);
+
+  const overDueTasks = tasks.filter((el) => el.overDue);
+
+  // console.log(`overdue tasks are ${overDueTasks}`);
+
+  res.status(200).json({
+    status: "success",
+    results: overDueTasks.length,
+    data: {
+      tasks: overDueTasks,
+    },
+  });
+});
+
 exports.getTask = catchAsync(async (req, res) => {
   const task = await Task.findById(req.params.id);
   console.log(`Task is ${task}`);
