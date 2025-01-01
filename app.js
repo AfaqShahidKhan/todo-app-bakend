@@ -1,8 +1,8 @@
 const express = require("express");
 const taskRoute = require("./routes/taskRoute");
 const userRoute = require("./routes/userRoute");
-
 const globalErrorHandler = require("./controllers/errorController");
+const AppError = require("./utils/appError");
 
 const app = express();
 
