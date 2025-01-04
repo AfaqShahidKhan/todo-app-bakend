@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const promisify = require("util");
+const {promisify} = require("util");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -51,7 +51,7 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.protected = catchAsync(async (req, res, next) => {
   let token;
 
-  if (req.headers.authorization && req.authorization.startsWith("Bearer")) {
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     token = req.headers.authorization.split(" ")[1];
     console.log(`token value is ${token}`);
   }
@@ -65,7 +65,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   console.log(`decoded token is ---- ${JSON.stringify(decoded)}`);
 
-  const freshUser = await User.findById(decode._id);
+  const freshUser = await User.findById(decoded._id);
 
   if (!freshUser) {
     return next(
