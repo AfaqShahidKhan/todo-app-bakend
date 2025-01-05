@@ -65,7 +65,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   console.log(`decoded token is ---- ${JSON.stringify(decoded)}`);
 
-  const freshUser = await User.findById(decoded._id);
+  const freshUser = await User.findById(decoded.id);
 
   if (!freshUser) {
     return next(
