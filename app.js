@@ -1,10 +1,31 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
+const hpp = require("hpp");
 const taskRoute = require("./routes/taskRoute");
 const userRoute = require("./routes/userRoute");
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
 
 const app = express();
+// set Security HTTP headers
+app.use(helmet());
+
+// Limit request from same IP
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "To many requests from this device, please try again after an Hour",
+});
+app.use("/api", limiter);
+
+// Data Sanitization against NoSQL query injections
+app.use(mongoSanitize());
+
+// Data sanitize against XSS
+app.use(xss());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
