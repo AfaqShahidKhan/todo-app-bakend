@@ -88,6 +88,17 @@ exports.protected = catchAsync(async (req, res, next) => {
   next();
 });
 
+exports.restrictTo = (...roles) => {
+  return async (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You are not allowed to perform this action", 401)
+      );
+    }
+    next();
+  };
+};
+
 exports.forgotPassword = catchAsync(async function (req, res, next) {
   const { email } = req.body;
   const user = await User.findOne({ email });

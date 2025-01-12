@@ -32,31 +32,31 @@ const taskSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );
 
 taskSchema.pre("save", function (next) {
-  if (this.dueDate < Date.now()) {
+  if (this.dueDate && this.dueDate < Date.now()) {
     this.overDue = true;
   }
+  next();
+});
+
+taskSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "user",
+    select: "-__v -password",
+  });
   next();
 });
 
 // taskSchema.index({ title: 1 }, { unique: true });
 
 const Task = mongoose.model("Task", taskSchema);
-
-Task.filterTasks = async (queryParams) => {
-  const features = new ApiFeatures(Task.find(), queryParams)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tasks = await features.query;
-  return tasks;
-};
-
-
 
 module.exports = Task;

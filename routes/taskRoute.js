@@ -1,7 +1,7 @@
 const express = require("express");
 
 const taskController = require("../controllers/taskController");
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.get('/overdue',taskController.getAllOverDueTasks)
 

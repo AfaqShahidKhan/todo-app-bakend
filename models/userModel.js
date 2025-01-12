@@ -4,44 +4,61 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const AppError = require("./../utils/appError");
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: [true, "Name is required"],
-    minLength: [3, "Name should be of 3 characters or more"],
-    maxLength: [20, "Name should have maximum 20 characters"],
-  },
-  email: {
-    type: String,
-    trim: true,
-    lowercase: true,
-    unique: true,
-    required: [true, "Email is required"],
-    validate: [validator.isEmail, "Please write correct email"],
-  },
-  password: {
-    type: String,
-    minLength: [4, "Password should have minimum 4 characters"],
-    required: [true, "Password is required"],
-    select: false,
-  },
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      trim: true,
+      required: [true, "Name is required"],
+      minLength: [3, "Name should be of 3 characters or more"],
+      maxLength: [20, "Name should have maximum 20 characters"],
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      required: [true, "Email is required"],
+      validate: [validator.isEmail, "Please write correct email"],
+    },
+    password: {
+      type: String,
+      minLength: [4, "Password should have minimum 4 characters"],
+      required: [true, "Password is required"],
+      select: false,
+    },
 
-  passwordConfirm: {
-    type: String,
-    required: [true, "Please Confirm the password"],
-    validate: {
-      validator: function (el) {
-        return el === this.password;
+    passwordConfirm: {
+      type: String,
+      required: [true, "Please Confirm the password"],
+      validate: {
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords do not match",
       },
-      message: "Passwords do not match",
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: {
+      type: Date,
     },
   },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: {
-    type: Date,
-  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+
+userSchema.virtual("tasks", {
+  ref: "Task",
+  foreignField: "user",
+  localField: "_id",
 });
 
 userSchema.pre("save", async function (next) {

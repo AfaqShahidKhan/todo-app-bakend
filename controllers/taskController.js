@@ -1,17 +1,8 @@
 const Task = require("../models/taskModel");
-
+const factory = require("./handleFactory");
 const catchAsync = require("../utils/catchAsync");
 
-exports.getAllTasks = catchAsync(async (req, res) => {
-  const tasks = await Task.filterTasks(req.query);
-  res.status(200).json({
-    status: "success",
-    results: tasks.length,
-    data: {
-      tasks,
-    },
-  });
-});
+exports.getAllTasks = factory.getAll(Task);
 
 exports.getAllOverDueTasks = catchAsync(async (req, res, next) => {
   const tasks = await Task.find();
@@ -32,65 +23,10 @@ exports.getAllOverDueTasks = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getTask = catchAsync(async (req, res) => {
-  const task = await Task.findById(req.params.id);
-  console.log(`Task is ${task}`);
+exports.getTask = factory.getOne(Task);
 
-  if (!task) {
-    return res.status(404).json({
-      status: "failed",
-      message: "No task found with that ID",
-    });
-  }
-  res.status(200).json({
-    status: "success",
-    data: {
-      task,
-    },
-  });
-});
+exports.createTask = factory.createOne(Task);
 
-exports.createTask = catchAsync(async (req, res) => {
-  const task = await Task.create(req.body);
-  res.status(201).json({
-    status: "success",
-    data: {
-      task,
-    },
-  });
-});
+exports.updateTask = factory.updateOne(Task);
 
-exports.updateTask = catchAsync(async (req, res) => {
-  const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!task) {
-    return res.status(404).json({
-      status: "failed",
-      message: "No task found with that ID",
-    });
-  }
-  res.status(200).json({
-    status: "success",
-    data: {
-      task,
-    },
-  });
-});
-
-exports.deleteTask = catchAsync(async (req, res) => {
-  const task = await Task.findByIdAndDelete(req.params.id);
-  if (!task) {
-    return res.status(404).json({
-      status: "failed",
-      message: "No task found with that ID",
-    });
-  }
-  console.log(`Deleted task is ${task}`);
-
-  res.status(204).json({
-    status: "success",
-    data: null,
-  });
-});
+exports.deleteTask = factory.deleteOne(Task);
