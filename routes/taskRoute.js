@@ -1,9 +1,12 @@
 const express = require("express");
 
 const taskController = require("../controllers/taskController");
+const authController = require("../controllers/authController");
+
 const router = express.Router({ mergeParams: true });
 
-router.get('/overdue',taskController.getAllOverDueTasks)
+router.use(authController.protected);
+router.get("/overdue", taskController.getAllOverDueTasks);
 
 router
   .route("/")
@@ -12,7 +15,7 @@ router
 router
   .route("/:id")
   .get(taskController.getTask)
-  .put(taskController.updateTask)
-  .delete(taskController.deleteTask);
+  .put(authController.restrictTo("admin"), taskController.updateTask)
+  .delete(authController.restrictTo("admin"), taskController.deleteTask);
 
 module.exports = router;
