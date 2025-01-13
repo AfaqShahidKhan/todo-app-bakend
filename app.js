@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors');
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
@@ -29,6 +30,13 @@ app.use(xss());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const corsOptions = {
+  origin: 'http://localhost:5000',
+  methods: 'GET,POST',
+  allowedHeaders: 'Content-Type,Authorization',
+};
+
+app.use(cors(corsOptions));
 
 app.use("/api/v1/tasks", taskRoute);
 app.use("/api/v1/users", userRoute);
