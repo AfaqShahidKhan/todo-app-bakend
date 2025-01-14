@@ -25,6 +25,11 @@ const taskSchema = new mongoose.Schema(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
+    recurring: {
+      type: String,
+      enum: ["none", "daily", "weekly", "biweekly", "monthly"],
+      default: "none",
+    },
     dueDate: {
       type: Date,
     },
