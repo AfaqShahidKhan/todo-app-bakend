@@ -13,8 +13,14 @@ const signInToken = (id) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm } = req.body;
-  const user = await User.create({ name, email, password, passwordConfirm });
+  const { name, email, password, passwordConfirm, role } = req.body;
+  const user = await User.create({
+    name,
+    email,
+    password,
+    passwordConfirm,
+    role,
+  });
   const token = await signInToken(user._id);
   // console.log(`Ttoken is ${token}`);
 
@@ -105,9 +111,7 @@ exports.forgotPassword = catchAsync(async function (req, res, next) {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://${req.get("host")}${
-    req.originalUrl
-  }/${resetToken}`;
+  const resetURL = `http://localhost:5000/forgot-password/${resetToken}`;
 
   const message = `Please submit a PATCH request on this url:  ${resetURL}`;
   try {

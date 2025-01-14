@@ -10,7 +10,7 @@ exports.getAll = (Model) =>
       .limitFields()
       .paginate();
     const docs = await features.query;
-    console.log(`Filtered docs: ${JSON.stringify(docs)}`);
+    // console.log(`Filtered docs: ${JSON.stringify(docs)}`);
 
     res.status(200).json({
       status: "success",

@@ -21,13 +21,17 @@ const userSchema = new mongoose.Schema(
       required: [true, "Email is required"],
       validate: [validator.isEmail, "Please write correct email"],
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
     password: {
       type: String,
       minLength: [4, "Password should have minimum 4 characters"],
       required: [true, "Password is required"],
       select: false,
     },
-
     passwordConfirm: {
       type: String,
       required: [true, "Please Confirm the password"],
@@ -37,11 +41,6 @@ const userSchema = new mongoose.Schema(
         },
         message: "Passwords do not match",
       },
-    },
-    role: {
-      type: String,
-      enum: ["user", "admin"],
-      default: "user",
     },
     passwordChangedAt: Date,
     passwordResetToken: String,
