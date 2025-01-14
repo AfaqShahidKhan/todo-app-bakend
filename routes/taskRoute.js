@@ -15,7 +15,7 @@ router
 router
   .route("/:id")
   .get(taskController.getTask)
-  .put(authController.restrictTo("admin"), taskController.updateTask)
+  .patch(authController.restrictTo("user","admin"), taskController.updateTask)
   .delete(authController.restrictTo("admin"), taskController.deleteTask);
 
 module.exports = router;

@@ -32,7 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const corsOptions = {
   origin: 'http://localhost:5000',
-  methods: ['GET,POST','PATCH','DELETE'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   allowedHeaders: 'Content-Type,Authorization',
 };
 
