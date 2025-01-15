@@ -55,6 +55,12 @@ module.exports = class Email {
     await this.sendMail(subject, text);
   }
 
+  async sendRecurringNotification() {
+    const subject = "Reminder from the TODO App!";
+    const text = `Hi ${this.firstName},\n\nThis is a friendly reminder from the TODO app to keep you on track with your tasks. Stay productive and accomplish your goals!`;
+    await this.sendMail(subject, text);
+  }
+
   async sendPasswordReset() {
     const subject = "Password Reset Request";
     const text = `Hello ${this.firstName},\n\nYou requested a password reset. Click on the following link to reset your password: ${this.url}`;
