@@ -5,6 +5,7 @@ const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
+const Email = require("../utils/email");
 
 const signInToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -23,6 +24,8 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
   const token = await signInToken(user._id);
   // console.log(`Ttoken is ${token}`);
+  const sendUserEmail = new Email(user, null);
+  sendUserEmail.sendWelcome();
 
   res.status(200).json({
     status: "success",
@@ -115,11 +118,13 @@ exports.forgotPassword = catchAsync(async function (req, res, next) {
 
   const message = `Please submit a PATCH request on this url:  ${resetURL}`;
   try {
-    await sendEmail({
-      email: user.email,
-      subjec: "Your Password Reset Token(Valid for 10 minutes)",
-      message,
-    });
+    // await sendEmail({
+    //   email: user.email,
+    //   subjec: "Your Password Reset Token(Valid for 10 minutes)",
+    //   message,
+    // });
+    const sendUserEmail = new Email(user, resetURL);
+    sendUserEmail.sendPasswordReset();
     res.status(200).json({
       status: "success",
       message: "Token sent to email!",
