@@ -1,5 +1,32 @@
+const schedule = require("node-schedule");
 const ApiFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
+
+const frequencyMap = {
+  daily: "0 9 * * *", // Every day at 9:00 AM
+  weekly: "0 9 * * 1", // Every Monday at 9:00 AM
+  biweekly: "0 9 */14 * *", // Every 14 days at 9:00 AM
+  monthly: "0 9 1 * *", // On the 1st of every month at 9:00 AM
+};
+const scheduleTask = async (Model, task) => {
+  const cronExpression = frequencyMap[task.recurring];
+  // console.log("i am upper most", task);
+
+  if (cronExpression) {
+    schedule.scheduleJob(cronExpression, async () => {
+      try {
+        const { _id, recurring, ...newTask } = task;
+
+        const doc = await Model.create(newTask);
+        // console.log(`Recurring task created:`, doc);
+      } catch (error) {
+        console.error("Error creating recurring task:", error);
+      }
+    });
+  } else {
+    console.error("Invalid frequency:", task.recurring);
+  }
+};
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
@@ -23,7 +50,17 @@ exports.getAll = (Model) =>
 
 exports.createOne = (Model) =>
   catchAsync(async (req, res) => {
-    const doc = await Model.create(req.body);
+    let doc;
+
+    if (req.body.recurring && req.body.recurring !== "none") {
+      doc = await Model.create(req.body);
+
+      await scheduleTask(Model, req.body);
+      // console.log("i am up", doc);
+    } else {
+      doc = await Model.create(req.body);
+      // console.log("i am here", doc);
+    }
     res.status(201).json({
       status: "success",
       data: {
