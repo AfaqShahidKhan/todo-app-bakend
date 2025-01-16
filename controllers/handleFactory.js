@@ -35,7 +35,9 @@ const scheduleTask = async (Model, task) => {
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
-    const filter = req.params.userId ? { user: req.params.userId } : {};
+    const currentUser = req.user;    
+    const filter =
+      currentUser.role === "admin" ? {} : { user: req.params.userId };
     const features = new ApiFeatures(Model.find(filter), req.query)
       .filter()
       .sort()
