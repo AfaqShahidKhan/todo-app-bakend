@@ -37,6 +37,10 @@ const taskSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    updatedBy: {
+      type: String,
+      default: null,
+    },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

@@ -35,7 +35,7 @@ const scheduleTask = async (Model, task) => {
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
-    const currentUser = req.user;    
+    const currentUser = req.user;
     const filter =
       currentUser.role === "admin" ? {} : { user: req.params.userId };
     const features = new ApiFeatures(Model.find(filter), req.query)
@@ -95,6 +95,13 @@ exports.getOne = (Model) =>
 
 exports.updateOne = (Model) =>
   catchAsync(async (req, res) => {
+    const userName = req.user ? req.user.name : "Unknown";
+    if (Model.modelName === "Task") {
+      if (!req.body.updatedBy) {
+        req.body.updatedBy = userName;
+      }
+    }
+
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
