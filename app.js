@@ -11,40 +11,43 @@ const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
 
 const app = express();
-// set Security HTTP headers
-app.use(helmet());
 
-// Limit request from same IP
+// CORS setup
+const corsOptions = {
+  origin: 'http://localhost:3000',  // Allow requests from the frontend on port 3000
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],  // Allow these HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'],  // Allow these headers
+};
+
+app.use(cors(corsOptions));  // Apply CORS middleware globally
+
+// Other middleware
+app.use(helmet());  // Set security HTTP headers
+app.use(express.json());  // Parse JSON bodies
+app.use(express.urlencoded({ extended: true }));
+
+// Rate limiting
 const limiter = rateLimit({
   max: 100,
-  windowMs: 60 * 60 * 1000,
-  message: "To many requests from this device, please try again after an Hour",
+  windowMs: 60 * 60 * 1000,  // 1 hour
+  message: "Too many requests, please try again after an hour",
 });
 app.use("/api", limiter);
 
-// Data Sanitization against NoSQL query injections
+// Data sanitization against NoSQL query injections and XSS
 app.use(mongoSanitize());
-
-// Data sanitize against XSS
 app.use(xss());
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: 'Content-Type,Authorization',
-};
-
-app.use(cors(corsOptions));
-
+// Routes
 app.use("/api/v1/tasks", taskRoute);
 app.use("/api/v1/users", userRoute);
 
+// Catch-all route for non-existent endpoints
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`));
 });
 
+// Global error handler
 app.use(globalErrorHandler);
 
 module.exports = app;
