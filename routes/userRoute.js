@@ -23,7 +23,8 @@ router.get(
   authController.restrictTo("admin"),
   userController.getAllUsers
 );
-router.get('/user', authController.protected, userController.getUser)
+
+router.get("/me", userController.getMe, userController.getUser);
 
 router.use("/:userId/tasks", taskRouter);
 module.exports = router;

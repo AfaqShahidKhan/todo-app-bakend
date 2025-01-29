@@ -24,6 +24,21 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
   const token = await signInToken(user._id);
   // console.log(`Ttoken is ${token}`);
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
+  res.cookie("user", JSON.stringify(user), {
+    httpOnly: false, // This cookie is accessible on the client-side
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
   const sendUserEmail = new Email(user, null);
   sendUserEmail.sendWelcome();
 
@@ -49,7 +64,18 @@ exports.login = catchAsync(async (req, res, next) => {
 
   const token = signInToken(user._id);
   // console.log(`user token is----- ${token}`);
-
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+  res.cookie("user", JSON.stringify(user), {
+    httpOnly: false, // This cookie is accessible on the client-side
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
   res.status(200).json({
     status: "success",
     token,

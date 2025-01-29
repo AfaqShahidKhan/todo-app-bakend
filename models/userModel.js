@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    photo:{
+     type:String,
+     default: 'default.jpg'
+    },
     password: {
       type: String,
       minLength: [4, "Password should have minimum 4 characters"],
