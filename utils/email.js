@@ -56,7 +56,13 @@ module.exports = class Email {
   }
 
   async sendRecurringNotification() {
-    const subject = "Reminder from the TODO App!";
+    const subject = "Task Repeat again from the TODO App!";
+    const text = `Hi ${this.firstName},\n\nThis is a friendly reminder from the TODO app that your task is again Created. Stay productive and accomplish your goals!`;
+    await this.sendMail(subject, text);
+  }
+
+  async sendReminderNotification() {
+    const subject = "Task Reminder from the TODO App!";
     const text = `Hi ${this.firstName},\n\nThis is a friendly reminder from the TODO app to keep you on track with your tasks. Stay productive and accomplish your goals!`;
     await this.sendMail(subject, text);
   }

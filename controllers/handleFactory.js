@@ -33,6 +33,44 @@ const scheduleTask = async (Model, task) => {
   }
 };
 
+const scheduleReminderNotification = async (Model, task) => {
+  if (!task.reminder) return;
+
+  const user = await Model.findById(task._id).populate("user");
+  if (!user) return console.error("User not found for reminder notification.");
+
+  const reminderTime = new Date(task.reminder);
+
+  if (reminderTime < new Date()) {
+    console.error("Reminder time is in the past. Ignoring.");
+    return;
+  }
+  await Model.findByIdAndUpdate(task._id, { $set: { scheduled: true } });
+
+  schedule.scheduleJob(task._id.toString(), reminderTime, async () => {
+    try {
+      const sendUserEmail = new Email(user.user, null);
+      sendUserEmail.sendReminderNotification(task);
+      console.log(`Reminder sent for task:`, task.name);
+      await Model.findByIdAndUpdate(task._id, { $set: { scheduled: false } });
+
+    } catch (error) {
+      console.error("Error sending reminder notification:", error);
+    }
+  });
+};
+
+exports.rescheduleJobsOnRestart = async (Model) => {
+  const tasks = await Model.find({ scheduled: true });
+
+  tasks.forEach((task) => {
+    scheduleReminderNotification(Model, task);
+  });
+
+  console.log(`Rescheduled ${tasks.length} reminder jobs.`);
+};
+
+
 exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
     const currentUser = req.user;
@@ -57,15 +95,16 @@ exports.getAll = (Model) =>
 
 exports.createOne = (Model) =>
   catchAsync(async (req, res) => {
-    let doc;
+    let doc = await Model.create(req.body);
 
     if (req.body.recurring && req.body.recurring !== "none") {
-      doc = await Model.create(req.body);
-
       await scheduleTask(Model, req.body);
-    } else {
-      doc = await Model.create(req.body);
     }
+
+    if (req.body.reminder) {
+     await scheduleReminderNotification(Model, doc);
+    }
+
     res.status(201).json({
       status: "success",
       data: {
@@ -112,6 +151,10 @@ exports.updateOne = (Model) =>
         message: "No document found with that ID",
       });
     }
+    if (req.body.reminder) {
+      scheduleReminderNotification(Model, doc);
+    }
+
     res.status(200).json({
       status: "success",
       data: {

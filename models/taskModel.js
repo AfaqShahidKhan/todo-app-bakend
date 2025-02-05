@@ -33,6 +33,7 @@ const taskSchema = new mongoose.Schema(
     dueDate: {
       type: Date,
     },
+    reminder: { type: Date, default: null },
     overDue: {
       type: Boolean,
       default: false,
