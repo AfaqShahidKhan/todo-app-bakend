@@ -24,7 +24,15 @@ router.get(
   userController.getAllUsers
 );
 
+router.use(authController.protected);
+
 router.get("/me", userController.getMe, userController.getUser);
+
+router.patch(
+  "/updateMe",
+  userController.updateUserPhoto,
+  userController.updateMe
+);
 
 router.use("/:userId/tasks", taskRouter);
 module.exports = router;
