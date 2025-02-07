@@ -23,6 +23,15 @@ exports.getAllOverDueTasks = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getAssignToMe = catchAsync(async (req, res, next) => {
+  const tasks = await Task.find({ user: req.user.id });
+  res.status(200).json({
+    status: "success",
+    results: tasks.length,
+    data: { data: tasks },
+  });
+});
+
 exports.getTask = factory.getOne(Task);
 
 exports.createTask = factory.createOne(Task);

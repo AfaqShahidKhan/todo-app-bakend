@@ -9,6 +9,7 @@ const taskRoute = require("./routes/taskRoute");
 const userRoute = require("./routes/userRoute");
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
+const path = require('path');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(cors(corsOptions));  // Apply CORS middleware globally
 app.use(helmet());  // Set security HTTP headers
 app.use(express.json());  // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }));
+app.use('/images/users', express.static(path.join(__dirname, 'public/images/users')));
 
 // Rate limiting
 const limiter = rateLimit({

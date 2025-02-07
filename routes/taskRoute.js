@@ -8,6 +8,8 @@ const router = express.Router({ mergeParams: true });
 router.use(authController.protected);
 router.get("/overdue", taskController.getAllOverDueTasks);
 
+router.get("/assignToMe", taskController.getAssignToMe);
+
 router
   .route("/")
   .get(taskController.getAllTasks)
@@ -15,7 +17,7 @@ router
 router
   .route("/:id")
   .get(taskController.getTask)
-  .patch(authController.restrictTo("user","admin"), taskController.updateTask)
+  .patch(authController.restrictTo("user", "admin"), taskController.updateTask)
   .delete(authController.restrictTo("admin"), taskController.deleteTask);
 
 module.exports = router;
